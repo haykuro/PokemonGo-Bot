@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Simple Map</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <style>
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/css/materialize.min.css">
+
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/js/materialize.min.js"></script>
+    <link rel="stylesheet" href="main.css">
+  </head>
+  <body>
+    <div class="container" id="menu">
+      <div class="row" id="options">
+        <div class="col s12">
+          <div class="card white">
+            <div class="card-content black-text">
+              <span class="card-title">Options</span>
+              <ul>
+                <li>
+                  Pan
+                  <div class="switch">
+                    <label>
+                      Off
+                      <input type="checkbox" id="switchPan">
+                      <span class="lever"></span>
+                      On
+                    </label>
+                  </div>
+                  <br>
+                </li>
+                <li>
+                  Zoom
+                  <div class="switch">
+                    <label>
+                      Off
+                      <input type="checkbox" id="switchZoom">
+                      <span class="lever"></span>
+                      On
+                    </label>
+                  </div>
+                  <br>
+                </li>
+                <li>
+                  Image Type
+                  <div class="switch">
+                    <label>
+                      png
+                      <input type="checkbox" id="imageType">
+                      <span class="lever"></span>
+                      gif
+                    </label>
+                  </div>
+                  <br>
+                </li>
+              </ul>
+
+              <div class="trainer_card">
+              <span class="card-title">Trainer</span>
+                <select class="browser-default" id="trainer_users"></select>
+            <ul>
+                  <li><a class="waves-effect waves-light btn" id="tInfo">Info</a></li><br />
+                  <li><a class="waves-effect waves-light btn" id="tItems">Items</a></li><br />
+                  <li><a class="waves-effect waves-light btn" id="tPokemon">Pokemon</a></li><br />
+              <li><a class="waves-effect waves-light btn" id="tPokedex">Pokedex</a></li>
+            </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <div class="container" id="submenu">
+        <div class="col s12">
+          <div class="card white">
+            <div class="card-content black-text">
+              <span class="card-title" id="subtitle">Submenu</span>
+              <div id="subcontent">
+                <div class="trainer_info">
+                  <div class="row">
+                    <div class="col s12">
+                      <h5 class="username"></h5><br />
+                      <p>Level: <span class="level"></span></p>
+                      <p>Experience: <span class="experience"></span></p>
+                      <p>Exp To Level: <span class="exptolevel"></span></p>
+                      <p>Pokemon Encountered: <span class="pokemon_encountered"></span></p>
+                      <p>Pokeballs Thrown: <span class="pokeballs_thrown"></span></p>
+                      <p>Pokemon Caught: <span class="pokemon_caught"></span></p>
+                      <p>Small Ratat Caught: <span class="small_ratata_caught"></span></p>
+                      <p>Pokemon Evolved: <span class="pokemon_evolved"></span></p>
+                      <p>Eggs Hatched: <span class="eggs_hatched"></span></p>
+                      <p>Unique Pokedex Entries: <span class="unique_pokedex_entries"></span></p>
+                      <p>PokeStops Visited: <span class="pokestops_visited"></span></p>
+                      <p>Kilometers Walked: <span class="km_walked"></span></p>
+                    </div>
+                  </div>
+                </div>
+                <div id="unfinished_toggles"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+
+    <div id="map"></div>
+    <script type="text/javascript" src="userdata.js"></script>
+    <script type="text/javascript" src="main.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOURKEYHERE&amp;callback=initMap"
+    async defer></script>
+  </body>
+</html>
