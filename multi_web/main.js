@@ -357,7 +357,7 @@ var sideMenu = {
     out = '<div class="row items"><div class="col s12"><h5>' + users[sideMenu.selectedUser] + '</h5>';
 
     for (var i = 0; i < trainer_bag_items.length; i++) {
-      out += '<table><tr><td><img src="/image/items/' + trainer_bag_items[i].inventory_item_data.item.item_id + '.png" class="item_img"></td><td>Item: ' + itemsArray[trainer_bag_items[i].inventory_item_data.item.item_id] +
+      out += '<table><tr><td><img src="image/items/' + trainer_bag_items[i].inventory_item_data.item.item_id + '.png" class="item_img"></td><td>Item: ' + itemsArray[trainer_bag_items[i].inventory_item_data.item.item_id] +
       '<br>Count: ' + trainer_bag_items[i].inventory_item_data.item.count + '</td>';
     }
     out += '</tr></table></div></div>';
@@ -367,22 +367,42 @@ var sideMenu = {
   showPokemon: function(e) {
     sideMenu.subTitleEl.html('Pokemon in Bag');
     var trainer = user_data[users[sideMenu.selectedUser]];
-    var trainer_pokemon = trainer.bag_pokemon;
+    var trainer_pokemon = [];
+    var pokemon = null;
+    var cp = null;
+    var pokemon_by_cp = {};
+    var i = 0;
+
+    for (i = 0; i < trainer.bag_pokemon.length; i++) {
+      pokemon = trainer.bag_pokemon[i].inventory_item_data.pokemon_data;
+      cp = pokemon.cp !== undefined ? parseInt(pokemon.cp) : 0;
+      if (pokemon_by_cp.hasOwnProperty(cp) === false) {
+        pokemon_by_cp[cp] = [];
+      }
+      pokemon_by_cp[cp].push(pokemon);
+    }
+
+    // sorted cp's high to low
+    var sorted_cp = Object.keys(pokemon_by_cp).sort(function(a, b) { return a-b; }).reverse();
 
     out = '<div class="row items"><div class="col s12"><h5>' + users[sideMenu.selectedUser] + '</h5><table>';
-    for (var i = 0; i < trainer_pokemon.length; i++) {
-      if (trainer_pokemon[i].inventory_item_data.pokemon_data.is_egg) {
-        pkmnNum = "???";
-        pkmnImage = "Egg.png";
-        pkmnName = "Egg";
-      } else {
-        pkmnNum = trainer_pokemon[i].inventory_item_data.pokemon_data.pokemon_id;
-        pkmnImage = pad_with_zeroes(trainer_pokemon[i].inventory_item_data.pokemon_data.pokemon_id, 3) + '.png';
-        pkmnName = pokemonArray[pkmnNum-1].Name;
+    for (i = 0; i < sorted_cp.length; i++) {
+      cp = sorted_cp[i];
+      for (var idx = 0; idx < pokemon_by_cp[cp].length; idx++) {
+        pokemon = pokemon_by_cp[cp][idx];
+        if (pokemon.is_egg) {
+          pkmnNum = "???";
+          pkmnImage = "Egg.png";
+          pkmnName = "Egg";
+        } else {
+          pkmnNum = pokemon.pokemon_id;
+          pkmnImage = pad_with_zeroes(pokemon.pokemon_id, 3) + '.gif';
+          pkmnName = pokemonArray[pkmnNum-1].Name;
+        }
+        the_cp = pokemon.cp ? pokemon.cp : '???';
+        out += '<tr><td><img src="/image/pokemon/' + pkmnImage + '" class="png_img"></td><td class="left-align">Name: ' + pkmnName +
+        '<br>Number: ' + pkmnNum + '<br>CP: ' + the_cp +'</td></tr>';
       }
-      the_cp = trainer_pokemon[i].inventory_item_data.pokemon_data.cp ? trainer_pokemon[i].inventory_item_data.pokemon_data.cp : '???';
-      out += '<tr><td><img src="/image/pokemon/' + pkmnImage + '" class="png_img"></td><td class="left-align">Name: ' + pkmnName +
-      '<br>Number: ' + pkmnNum + '<br>CP: ' + the_cp +'</td></tr>';
     }
     out += '</table></div></div>';
     $('#unfinished_toggles').html(out);
@@ -411,6 +431,14 @@ var sideMenu = {
 $("#trainer_users").on('change', function(e) {
   sideMenu.selectedUser = e.target.value;
   sideMenu.hideAllSubs();
+});
+
+$("#tFindTrainer").on('click', function() {
+  var pos = user_data[users[sideMenu.selectedUser]].marker.internalPosition;
+  map.panTo({
+    lat: parseFloat(pos.lat()),
+    lng: parseFloat(pos.lng())
+  });
 });
 
 $('#tInfo').click(function() {
