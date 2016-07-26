@@ -20,6 +20,7 @@ We use [Slack](https://slack.com) as a web chat. [Click here to join the chat!](
 - [ ] Incubate eggs
 - [ ] Use candy
 - [ ] Fight Gym
+- [ ] Inventory cleaner
 
 ## Wiki
 All information on [Getting Started](https://github.com/PokemonGoF/PokemonGo-Bot/wiki/Getting-Started) is available in the [Wiki](https://github.com/PokemonGoF/PokemonGo-Bot/wiki/)!
@@ -171,6 +172,7 @@ To update your project do: `git pull` in the project folder
 ## Usage (up-to-date)
   1. copy `config.json.example` to `config.json` and `release_config.json.example` to `release_config.json`
   2. Edit `config.json` and replace `auth_service`, `username`, `password`, `location` and `gmapkey` with your parameters (other keys are optional, check `Advance Configuration` below)
+  3. Simply launch the script with : `./run.sh` or `./pokecli.py` or `python pokecli.py --config-file ./configs/config.json` if you want to specify a config file
 
 ## Advance Configuration
 Option | Meaning
@@ -317,7 +319,7 @@ ignore:
 You can either view the map via opening the html file, or by serving it with SimpleHTTPServer (runs on localhost:8000)  
 To use SimpleHTTPServer:  
 ```$ python -m SimpleHTTPServer [port]```
-The default port is 8080, you can change that by giving a port number.
+The default port is 8000, you can change that by giving a port number.
 Anything above port 1000 does not require root.
 You will need to set your username(s) in the userdata.js file before opening:  
 Copy userdata.js.example to userdata.js and edit with your favorite text editor.
