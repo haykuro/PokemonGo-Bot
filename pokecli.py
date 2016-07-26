@@ -50,8 +50,7 @@ def init_config():
     parser.add_argument("-cf", "--config", help="Config File to use")
     parser.add_argument("-a",
                         "--auth_service",
-                        help="Auth Service ('ptc' or 'google')",
-                        required="auth_service")
+                        help="Auth Service ('ptc' or 'google')")
     parser.add_argument("-u", "--username", help="Username")
     parser.add_argument("-p", "--password", help="Password")
     parser.add_argument("-l", "--location", help="Location", type=lambda s: unicode(s, 'utf8'))
