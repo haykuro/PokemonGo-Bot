@@ -12,6 +12,7 @@
     "initial_transfer": false,
     "location_cache": true,
     "distance_unit": "km",
+    "reconnecting_timeout": 15,
     "item_filter": {
       "1": { "keep" : 100 },
       "101": { "keep" : 10 },
@@ -21,6 +22,7 @@
       "701": { "keep" : 100 }
     },
     "evolve_all": "NONE",
+    "evolve_speed": 20,
     "cp_min": 300,
     "use_lucky_egg": false,
     "evolve_captured": false,

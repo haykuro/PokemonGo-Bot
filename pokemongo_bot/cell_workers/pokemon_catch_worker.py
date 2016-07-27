@@ -45,7 +45,7 @@ class PokemonCatchWorker(object):
                         total_IV = 0
                         if 'wild_pokemon' in response_dict['responses'][self.response_key] or 'pokemon_data' in \
                                 response_dict['responses'][self.response_key]:
-                            if self.RESPONSE_KEY == 'ENCOUNTER':
+                            if self.response_key == 'ENCOUNTER':
                                 pokemon = response_dict['responses'][self.response_key]['wild_pokemon']
                             else:
                                 pokemon = response_dict['responses'][self.response_key]
@@ -193,6 +193,8 @@ class PokemonCatchWorker(object):
 
                                     id_list2 = self.count_pokemon_inventory()
 
+                                    self.bot.metrics.captured_pokemon(pokemon_name, cp, iv_display, pokemon_potential)
+
                                     logger.log('Captured {}! [CP {}] [{}]'.format(
                                         pokemon_name,
                                         cp,
@@ -201,6 +203,7 @@ class PokemonCatchWorker(object):
 
                                     if self.config.evolve_captured:
                                         pokemon_to_transfer = list(Set(id_list2) - Set(id_list1))
+                                        # No need to capture this even for metrics, player stats includes it.
                                         self.api.evolve_pokemon(pokemon_id=pokemon_to_transfer[0])
                                         response_dict = self.api.call()
                                         status = response_dict['responses']['EVOLVE_POKEMON']['result']
@@ -330,8 +333,6 @@ class PokemonCatchWorker(object):
         catch_config = self.config.catch.get(pokemon)
         if not catch_config:
             catch_config = self.config.catch.get('any')
-        if not catch_config:
-            catch_config = {}
         return catch_config
 
     def should_release_pokemon(self, pokemon_name, cp, iv, response_dict):
@@ -389,12 +390,12 @@ class PokemonCatchWorker(object):
         player_latitude = self.pokemon['latitude']
         player_longitude = self.pokemon['longitude']
 
-        if 'spawn_point_id' in self.pokemon:
-            spawn_point_id = self.pokemon['spawn_point_id']
-            self.spawn_point_guid = spawn_point_id
+        if 'spawnpoint_id' in self.pokemon:
+            spawnpoint_id = self.pokemon['spawnpoint_id']
+            self.spawn_point_guid = spawnpoint_id
             self.response_key = 'ENCOUNTER'
             self.response_status_key = 'status'
-            self.api.encounter(encounter_id=encounter_id, spawn_point_id=spawn_point_id,
+            self.api.encounter(encounter_id=encounter_id, spawn_point_id=spawnpoint_id,
                                player_latitude=player_latitude, player_longitude=player_longitude)
         else:
             fort_id = self.pokemon['fort_id']
