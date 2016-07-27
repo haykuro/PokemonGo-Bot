@@ -49,11 +49,30 @@ def init_config():
     config_file = "configs/config.json"
     web_dir = "web"
 
+    # If config file exists, load variables from json
+    load = {}
+
     # Select a config file code
     parser.add_argument("-cf", "--config", help="Config File to use")
-    parser.add_argument("-a",
-                        "--auth_service",
-                        help="Auth Service ('ptc' or 'google')")
+    config_arg = parser.parse_known_args() and parser.parse_known_args()[0].config or None
+    if config_arg and os.path.isfile(config_arg):
+        with open(config_arg) as data:
+            load.update(json.load(data))
+    elif os.path.isfile(config_file):
+        logger.log('No config argument specified, checking for /configs/config.json', 'yellow')
+        with open(config_file) as data:
+            load.update(json.load(data))
+    else:
+        logger.log('Error: No /configs/config.json or specified config', 'red')
+
+    # Read passed in Arguments
+    required = lambda x: not x in load
+    parser.add_argument(
+        "-a",
+        "--auth_service",
+        help="Auth Service ('ptc' or 'google')",
+        required=required("auth_service")
+    )
     parser.add_argument("-u", "--username", help="Username")
     parser.add_argument("-p", "--password", help="Password")
     parser.add_argument("-l", "--location", help="Location", type=lambda s: unicode(s, 'utf8'))
@@ -160,20 +179,6 @@ def init_config():
 
     # Start to parse other attrs
     config = parser.parse_args()
-
-    # If config file exists, load variables from json
-    load = {}
-    config_arg = unicode(config.config)
-    if os.path.isfile(config_arg):
-        with open(config_arg) as data:
-            load.update(json.load(data))
-    elif os.path.isfile(config_file):
-        with open(config_file) as data:
-            load.update(json.load(data))
-
-    # Read passed in Arguments
-    required = lambda x: not x in load
-
     if not config.username and 'username' not in load:
         config.username = raw_input("Username: ")
     if not config.password and 'password' not in load:
@@ -207,9 +212,12 @@ def init_config():
         parser.error("Needs either --use-location-cache or --location.")
         return None
 
-    # When config.item_filter looks like "101,102,103" needs to be converted to ["101","102","103"]
-    if isinstance(config.item_filter, basestring):
-        config.item_filter= config.item_filter.split(",")
+    # create web dir if not exists
+    try:
+        os.makedirs(web_dir)
+    except OSError:
+        if not os.path.isdir(web_dir):
+            raise
 
     if config.evolve_all:
         config.evolve_all = [str(pokemon_name) for pokemon_name in config.evolve_all.split(',')]
