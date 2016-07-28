@@ -29,9 +29,14 @@ class IncubateEggsWorker(object):
                 inv_data = inv_data.get("inventory_item_data", {})
 
                 if "egg_incubators" in inv_data:
-                    incubator = inv_data.get("egg_incubators", {}).get("egg_incubator", [])
-                    if "pokemon_id" not in incubator:
-                        incubators.append({"id":incubator.get("id", -1), "used":False})
+                    inccubator_data = inv_data.get("egg_incubators", {}).get("egg_incubator", [])
+                    if isinstance(inccubator_data, list):
+                        for incubator in inccubator_data:
+                            if "pokemon_id" not in incubator:
+                                incubators.append({"id":incubator.get("id", -1), "used":False})
+                    else:
+                        if "pokemon_id" not in inccubator_data:
+                            incubators.append({"id":inccubator_data.get("id", -1), "used":False})
 
                 if "pokemon_data" in inv_data:
                     pokemon = inv_data.get("pokemon_data", {})
