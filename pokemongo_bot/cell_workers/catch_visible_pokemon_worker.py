@@ -50,7 +50,6 @@ class CatchVisiblePokemonWorker(object):
 
     def get_lured_pokemon(self):
         forts = self.bot.get_forts(order_by_distance=True)
-        print 'forts', forts
         if len(forts) > 0:
             fort = forts[0]
 
