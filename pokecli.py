@@ -140,6 +140,14 @@ def init_config():
     add_config(
         parser,
         load,
+        short_flag="-ws",
+        long_flag="--websocket_server",
+        help="Start websocket server (format 'host:port')",
+        default=False
+    )
+    add_config(
+        parser,
+        load,
         short_flag="-p",
         long_flag="--password",
         help="Password",
@@ -151,7 +159,7 @@ def init_config():
         short_flag="-l",
         long_flag="--location",
         help="Location",
-        type=lambda s: not isinstance(s, unicode) and unicode(s, 'utf8') or str(s),
+        type=parse_unicode_str,
         default=''
     )
     add_config(
@@ -174,10 +182,10 @@ def init_config():
     add_config(
         parser,
         load,
-        long_flag="--spin_forts",
+        long_flag="--forts.spin",
         help="Enable Spinning Pokestops",
         type=bool,
-        default=True
+        default=True,
     )
     add_config(
         parser,
@@ -249,7 +257,7 @@ def init_config():
         load,
         short_flag="-ev",
         long_flag="--evolve_all",
-        help="(Batch mode) Pass \"all\" or a list of pokemons to evolve (e.g., \"Pidgey,Weedle,Caterpie\"). Bot will start by attempting to evolve all pokemons. Great after popping a lucky egg!",
+        help="(Batch mode) Pass \"all\" or a list of pokemon to evolve (e.g., \"Pidgey,Weedle,Caterpie\"). Bot will start by attempting to evolve all pokemon. Great after popping a lucky egg!",
         type=str,
         default=[]
     )
@@ -258,7 +266,7 @@ def init_config():
         load,
         short_flag="-ecm",
         long_flag="--evolve_cp_min",
-        help="Minimum CP for evolve all. Bot will attempt to first evolve highest IV pokemons with CP larger than this.",
+        help="Minimum CP for evolve all. Bot will attempt to first evolve highest IV pokemon with CP larger than this.",
         type=int,
         default=300
     )
@@ -267,7 +275,7 @@ def init_config():
         load,
         short_flag="-ec",
         long_flag="--evolve_captured",
-        help="(Ad-hoc mode) Bot will attempt to evolve all the pokemons captured!",
+        help="(Ad-hoc mode) Bot will attempt to evolve all the pokemon captured!",
         type=bool,
         default=False
     )
@@ -297,6 +305,24 @@ def init_config():
         help="Send anonymous bot event to GA for bot health record. Set \"health_record\":false if you need disable it.",
         type=bool,
         default=True
+    )
+    add_config(
+        parser,
+        load,
+        short_flag="-ac",
+        long_flag="--forts.avoid_circles",
+        help="Avoids circles (pokestops) of the max size set in max_circle_size flag",
+        type=bool,
+        default=False,
+    )
+    add_config(
+        parser,
+        load,
+        short_flag="-mcs",
+        long_flag="--forts.max_circle_size",
+        help="If avoid_circles flag is set, this flag specifies the maximum size of circles (pokestops) avoided",
+        type=int,
+        default=10,
     )
 
     # Start to parse other attrs
@@ -338,13 +364,22 @@ def init_config():
     if config.evolve_all and isinstance(config.evolve_all, str):
         config.evolve_all = [str(pokemon_name) for pokemon_name in config.evolve_all.split(',')]
 
+    fix_nested_config(config)
     return config
 
 def add_config(parser, json_config, short_flag=None, long_flag=None, **kwargs):
     if not long_flag:
         raise Exception('add_config calls requires long_flag parameter!')
+
+    full_attribute_path = long_flag.split('--')[1]
+    attribute_name = full_attribute_path.split('.')[-1]
+
+    if '.' in full_attribute_path: # embedded config!
+        embedded_in = full_attribute_path.split('.')[0: -1]
+        for level in embedded_in:
+            json_config = json_config.get(level, {})
+
     if 'default' in kwargs:
-        attribute_name = long_flag.split('--')[1]
         kwargs['default'] = json_config.get(attribute_name, kwargs['default'])
     if short_flag:
         args = (short_flag, long_flag)
@@ -352,6 +387,22 @@ def add_config(parser, json_config, short_flag=None, long_flag=None, **kwargs):
         args = (long_flag,)
     parser.add_argument(*args, **kwargs)
 
-    
+
+def fix_nested_config(config):
+    config_dict = config.__dict__
+
+    for key, value in config_dict.iteritems():
+        if '.' in key:
+            new_key = key.replace('.', '_')
+            config_dict[new_key] = value
+            del config_dict[key]
+
+def parse_unicode_str(string):
+    try:
+        return string.decode('utf8')
+    except UnicodeEncodeError:
+        return string
+
+
 if __name__ == '__main__':
     main()
